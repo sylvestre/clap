@@ -16,7 +16,6 @@ use crate::util::Id;
 // Localization macros
 use crate::{msg, msg_args};
 
-static DEFAULT_SUB_VALUE_NAME: &str = "COMMAND";
 const USAGE_SEP: &str = "\n       ";
 
 pub(crate) struct Usage<'cmd> {
