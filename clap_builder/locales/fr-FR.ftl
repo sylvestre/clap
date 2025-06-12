@@ -114,4 +114,4 @@ error-context-values = valeurs
 
 # Messages de suggestion
 error-similar-exists-singular = un { $context } similaire existe : '{ $suggestion }'
-error-similar-exists-plural = des { $context } similaires existent :
+error-similar-exists-plural = des { $context } similaires existent : '{ $suggestion }'

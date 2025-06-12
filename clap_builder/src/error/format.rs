@@ -585,10 +585,10 @@ fn did_you_mean(styled: &mut StyledStr, styles: &Styles, context: &str, possible
                 "context" => context_name
             )
         };
-        let _ = write!(styled, " {}", message);
+        let _ = write!(styled, " {message}");
         for (i, possible) in possibles.iter().enumerate() {
             if i != 0 {
-                styled.push_str(", ");
+                styled.push_str(",");
             }
             let _ = write!(styled, " '{valid}{possible}{valid:#}'",);
         }

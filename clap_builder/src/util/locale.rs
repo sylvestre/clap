@@ -117,7 +117,6 @@ macro_rules! msg_args {
         $crate::util::locale::get_message_internal($id, $english, Some(fluent_args))
     }};
 }
-}
 
 #[cfg(feature = "i18n")]
 struct Localizer {
