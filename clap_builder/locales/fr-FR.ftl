@@ -65,7 +65,7 @@ validation-mode-normal = mode normal
 # Messages d'erreur
 error-file-not-found = Fichier non trouvé : { $path }
 error-validation-strict-failed = La validation stricte a échoué pour le fichier '{ $file }' : format non supporté
-error-unrecognized-subcommand = Sous-commande non reconnue : { $subcommand }
+error-unrecognized-subcommand = Sous-commande non reconnue '{ $subcommand }'
 
 # Système d'erreur principal
 error-unknown-cause = cause inconnue
@@ -89,7 +89,7 @@ error-requires-subcommand = '{ $command }' nécessite une sous-commande mais auc
 error-subcommands = sous-commandes
 
 # Arguments manquants
-error-missing-required-arguments = les arguments requis suivants n'ont pas été fournis
+error-missing-required-arguments = les arguments requis suivants n'ont pas été fournis:
 
 # Erreurs de nombre de valeurs
 error-unexpected-value-no-more-expected = valeur inattendue '{ $value }' pour '{ $argument }' trouvée ; aucune autre n'était attendue

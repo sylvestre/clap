@@ -4422,6 +4422,13 @@ impl Command {
                 }
             }
 
+            #[cfg(feature = "i18n")]
+            {
+                if let Err(err) = crate::util::locale::setup_localization("clap") {
+                    eprintln!("Failed to set up localization: {err}");
+                }
+            }
+
             #[cfg(debug_assertions)]
             assert_app(self);
             self.settings.set(AppSettings::Built);

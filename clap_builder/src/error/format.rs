@@ -528,10 +528,8 @@ fn try_help(styled: &mut StyledStr, styles: &Styles, help: Option<&str>) {
 #[cfg(feature = "error-context")]
 fn did_you_mean(styled: &mut StyledStr, styles: &Styles, context: &str, possibles: &ContextValue) {
     use std::fmt::Write as _;
-
     let valid = &styles.get_valid();
     let _ = write!(styled, "{TAB}{valid}{}:{valid:#}", msg!("error-tip", "tip"));
-
     if let ContextValue::String(possible) = possibles {
         let context_name = match context {
             "subcommand" => msg!("error-context-subcommand", "subcommand"),
@@ -575,23 +573,34 @@ fn did_you_mean(styled: &mut StyledStr, styles: &Styles, context: &str, possible
         let message = if possibles.len() == 1 {
             msg_args!(
                 "error-similar-exists-singular",
-                "a similar {context} exists:",
-                "context" => context_name
+                "a similar {context} exists: '{suggestion}'",
+                "context" => context_name,
+                "suggestion" => format!("{valid}{}{valid:#}", possibles[0])
             )
         } else {
+            // Format suggestions so that when wrapped in quotes by the template,
+            // each suggestion gets individual quotes: 'test', 'temp'
+            let formatted_suggestions = possibles
+                .iter()
+                .enumerate()
+                .map(|(i, possible)| {
+                    if i == 0 {
+                        format!("{valid}{possible}{valid:#}")
+                    } else {
+                        format!("', '{valid}{possible}{valid:#}")
+                    }
+                })
+                .collect::<Vec<_>>()
+                .join("");
+
             msg_args!(
                 "error-similar-exists-plural",
-                "some similar {context} exist:",
-                "context" => context_name
+                "some similar {context} exist: '{suggestion}'",
+                "context" => context_name,
+                "suggestion" => formatted_suggestions
             )
         };
         let _ = write!(styled, " {message}");
-        for (i, possible) in possibles.iter().enumerate() {
-            if i != 0 {
-                styled.push_str(",");
-            }
-            let _ = write!(styled, " '{valid}{possible}{valid:#}'",);
-        }
     }
 }
 

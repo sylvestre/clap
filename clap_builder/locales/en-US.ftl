@@ -44,7 +44,7 @@ help-usage-line = my-cli-app [OPTIONS] <INPUT> [COMMAND]
 help-description = A sample CLI application demonstrating localization features.
 help-options-header = OPTIONS:
 help-commands-header = COMMANDS:
-help-commands = Commande
+help-commands = Commands
 help-examples-header = EXAMPLES:
 
 # Informational messages
@@ -65,7 +65,7 @@ validation-mode-normal = normal mode
 # Error messages
 error-file-not-found = File not found: { $path }
 error-validation-strict-failed = Strict validation failed for file '{ $file }': unsupported format
-error-unrecognized-subcommand = Unrecognized subcommand: { $subcommand }
+error-unrecognized-subcommand = unrecognized subcommand '{ $subcommand }'
 
 # Core error system
 error-unknown-cause = unknown cause
@@ -89,7 +89,7 @@ error-requires-subcommand = '{ $command }' requires a subcommand but one was not
 error-subcommands = subcommands
 
 # Missing arguments
-error-missing-required-arguments = the following required arguments were not provided
+error-missing-required-arguments = the following required arguments were not provided:
 
 # Value count errors
 error-unexpected-value-no-more-expected = unexpected value '{ $value }' for '{ $argument }' found; no more were expected
