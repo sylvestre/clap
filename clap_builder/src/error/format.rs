@@ -2,7 +2,7 @@
 #![allow(missing_debug_implementations)]
 #![cfg_attr(not(feature = "error-context"), allow(dead_code))]
 #![cfg_attr(not(feature = "error-context"), allow(unused_imports))]
-
+use crate::util::locale;
 use std::borrow::Cow;
 
 use crate::builder::Command;
@@ -15,6 +15,7 @@ use crate::error::ContextValue;
 use crate::error::ErrorKind;
 use crate::output::TAB;
 use crate::ArgAction;
+use crate::{msg, msg_args};
 
 /// Defines how to format an error for displaying to the user
 pub trait ErrorFormatter: Sized {
@@ -47,7 +48,7 @@ impl ErrorFormatter for KindFormatter {
         } else if let Some(source) = error.inner.source.as_ref() {
             let _ = write!(styled, "{source}");
         } else {
-            styled.push_str("unknown cause");
+            styled.push_str(&msg!("error-unknown-cause", "unknown cause"));
         }
         styled.push_str("\n");
         styled
@@ -77,7 +78,7 @@ impl ErrorFormatter for RichFormatter {
             } else if let Some(source) = error.inner.source.as_ref() {
                 let _ = write!(styled, "{source}");
             } else {
-                styled.push_str("unknown cause");
+                styled.push_str(&msg!("error-unknown-cause", "unknown cause"));
             }
         }
 
@@ -112,7 +113,11 @@ impl ErrorFormatter for RichFormatter {
                 styled.push_str("\n");
             }
             for suggestion in suggestions {
-                let _ = write!(styled, "\n{TAB}{valid}tip:{valid:#} ",);
+                let _ = write!(
+                    styled,
+                    "\n{TAB}{valid}{}:{valid:#} ",
+                    msg!("error-tip", "tip")
+                );
                 styled.push_styled(suggestion);
             }
         }
@@ -131,7 +136,7 @@ impl ErrorFormatter for RichFormatter {
 fn start_error(styled: &mut StyledStr, styles: &Styles) {
     use std::fmt::Write as _;
     let error = &styles.get_error();
-    let _ = write!(styled, "{error}error:{error:#} ");
+    let _ = write!(styled, "{error}{}:{error:#} ", msg!("error-label", "error"));
 }
 
 #[must_use]
@@ -152,23 +157,29 @@ fn write_dynamic_context(
             if let Some(ContextValue::String(invalid_arg)) = error.get(ContextKind::InvalidArg) {
                 if Some(&ContextValue::String(invalid_arg.clone())) == prior_arg {
                     prior_arg = None;
-                    let _ = write!(
-                        styled,
-                        "the argument '{invalid}{invalid_arg}{invalid:#}' cannot be used multiple times",
+                    let message = msg_args!(
+                        "error-argument-cannot-be-used-multiple-times",
+                        "the argument '{argument}' cannot be used multiple times",
+                        "argument" => format!("{invalid}{invalid_arg}{invalid:#}")
                     );
+                    styled.push_str(&message);
                 } else {
-                    let _ = write!(
-                        styled,
-                        "the argument '{invalid}{invalid_arg}{invalid:#}' cannot be used with",
+                    let message = msg_args!(
+                        "error-argument-cannot-be-used-with",
+                        "the argument '{argument}' cannot be used with",
+                        "argument" => format!("{invalid}{invalid_arg}{invalid:#}")
                     );
+                    styled.push_str(&message);
                 }
             } else if let Some(ContextValue::String(invalid_arg)) =
                 error.get(ContextKind::InvalidSubcommand)
             {
-                let _ = write!(
-                    styled,
-                    "the subcommand '{invalid}{invalid_arg}{invalid:#}' cannot be used with",
+                let message = msg_args!(
+                    "error-subcommand-cannot-be-used-with",
+                    "the subcommand '{subcommand}' cannot be used with",
+                    "subcommand" => format!("{invalid}{invalid_arg}{invalid:#}")
                 );
+                styled.push_str(&message);
             } else {
                 styled.push_str(error.kind().as_str().unwrap());
             }
@@ -185,7 +196,11 @@ fn write_dynamic_context(
                         let _ = write!(styled, " '{invalid}{value}{invalid:#}'",);
                     }
                     _ => {
-                        styled.push_str(" one or more of the other specified arguments");
+                        let msg = msg!(
+                            "error-one-or-more-other-arguments",
+                            "one or more of the other specified arguments"
+                        );
+                        styled.push_str(&format!(" {}", msg));
                     }
                 }
             }
@@ -195,10 +210,12 @@ fn write_dynamic_context(
         ErrorKind::NoEquals => {
             let invalid_arg = error.get(ContextKind::InvalidArg);
             if let Some(ContextValue::String(invalid_arg)) = invalid_arg {
-                let _ = write!(
-                    styled,
-                    "equal sign is needed when assigning values to '{invalid}{invalid_arg}{invalid:#}'",
+                let message = msg_args!(
+                    "error-equal-sign-needed",
+                    "equal sign is needed when assigning values to '{argument}'",
+                    "argument" => format!("{invalid}{invalid_arg}{invalid:#}")
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -213,19 +230,29 @@ fn write_dynamic_context(
             ) = (invalid_arg, invalid_value)
             {
                 if invalid_value.is_empty() {
-                    let _ = write!(
-                        styled,
-                        "a value is required for '{invalid}{invalid_arg}{invalid:#}' but none was supplied",
+                    let message = msg_args!(
+                        "error-value-required-but-none-supplied",
+                        "a value is required for '{argument}' but none was supplied",
+                        "argument" => format!("{invalid}{invalid_arg}{invalid:#}")
                     );
+                    styled.push_str(&message);
                 } else {
-                    let _ = write!(
-                        styled,
-                        "invalid value '{invalid}{invalid_value}{invalid:#}' for '{literal}{invalid_arg}{literal:#}'",
+                    let message = msg_args!(
+                        "error-invalid-value-for-argument",
+                        "invalid value '{value}' for '{argument}'",
+                        "value" => format!("{invalid}{invalid_value}{invalid:#}"),
+                        "argument" => format!("{literal}{invalid_arg}{literal:#}")
                     );
+                    styled.push_str(&message);
                 }
 
                 let values = error.get(ContextKind::ValidValue);
-                write_values_list("possible values", styled, valid, values);
+                write_values_list(
+                    &msg!("error-possible-values", "possible values"),
+                    styled,
+                    valid,
+                    values,
+                );
 
                 true
             } else {
@@ -235,10 +262,12 @@ fn write_dynamic_context(
         ErrorKind::InvalidSubcommand => {
             let invalid_sub = error.get(ContextKind::InvalidSubcommand);
             if let Some(ContextValue::String(invalid_sub)) = invalid_sub {
-                let _ = write!(
-                    styled,
-                    "unrecognized subcommand '{invalid}{invalid_sub}{invalid:#}'",
+                let message = msg_args!(
+                    "error-unrecognized-subcommand",
+                    "unrecognized subcommand '{subcommand}'",
+                    "subcommand" => format!("{invalid}{invalid_sub}{invalid:#}")
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -247,7 +276,10 @@ fn write_dynamic_context(
         ErrorKind::MissingRequiredArgument => {
             let invalid_arg = error.get(ContextKind::InvalidArg);
             if let Some(ContextValue::Strings(invalid_arg)) = invalid_arg {
-                styled.push_str("the following required arguments were not provided:");
+                styled.push_str(&msg!(
+                    "error-missing-required-arguments",
+                    "the following required arguments were not provided:"
+                ));
                 for v in invalid_arg {
                     let _ = write!(styled, "\n{TAB}{valid}{v}{valid:#}",);
                 }
@@ -259,12 +291,19 @@ fn write_dynamic_context(
         ErrorKind::MissingSubcommand => {
             let invalid_sub = error.get(ContextKind::InvalidSubcommand);
             if let Some(ContextValue::String(invalid_sub)) = invalid_sub {
-                let _ = write!(
-                    styled,
-                    "'{invalid}{invalid_sub}{invalid:#}' requires a subcommand but one was not provided",
+                let message = msg_args!(
+                    "error-requires-subcommand",
+                    "'{command}' requires a subcommand but one was not provided",
+                    "command" => format!("{invalid}{invalid_sub}{invalid:#}")
                 );
+                styled.push_str(&message);
                 let values = error.get(ContextKind::ValidSubcommand);
-                write_values_list("subcommands", styled, valid, values);
+                write_values_list(
+                    &msg!("error-subcommands", "subcommands"),
+                    styled,
+                    valid,
+                    values,
+                );
 
                 true
             } else {
@@ -280,10 +319,13 @@ fn write_dynamic_context(
                 Some(ContextValue::String(invalid_value)),
             ) = (invalid_arg, invalid_value)
             {
-                let _ = write!(
-                    styled,
-                    "unexpected value '{invalid}{invalid_value}{invalid:#}' for '{literal}{invalid_arg}{literal:#}' found; no more were expected",
+                let message = msg_args!(
+                    "error-unexpected-value-no-more-expected",
+                    "unexpected value '{value}' for '{argument}' found; no more were expected",
+                    "value" => format!("{invalid}{invalid_value}{invalid:#}"),
+                    "argument" => format!("{literal}{invalid_arg}{literal:#}")
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -300,10 +342,15 @@ fn write_dynamic_context(
             ) = (invalid_arg, actual_num_values, min_values)
             {
                 let were_provided = singular_or_plural(*actual_num_values as usize);
-                let _ = write!(
-                    styled,
-                    "{valid}{min_values}{valid:#} values required by '{literal}{invalid_arg}{literal:#}'; only {invalid}{actual_num_values}{invalid:#}{were_provided}",
+                let message = msg_args!(
+                    "error-values-required-only-provided",
+                    "{min_values} values required by '{argument}'; only {actual_values} {were_provided}",
+                    "min_values" => format!("{valid}{min_values}{valid:#}"),
+                    "argument" => format!("{literal}{invalid_arg}{literal:#}"),
+                    "actual_values" => format!("{invalid}{actual_num_values}{invalid:#}"),
+                    "were_provided" => were_provided
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -317,10 +364,13 @@ fn write_dynamic_context(
                 Some(ContextValue::String(invalid_value)),
             ) = (invalid_arg, invalid_value)
             {
-                let _ = write!(
-                    styled,
-                    "invalid value '{invalid}{invalid_value}{invalid:#}' for '{literal}{invalid_arg}{literal:#}'",
+                let message = msg_args!(
+                    "error-invalid-value-for-argument",
+                    "invalid value '{value}' for '{argument}'",
+                    "value" => format!("{invalid}{invalid_value}{invalid:#}"),
+                    "argument" => format!("{literal}{invalid_arg}{literal:#}")
                 );
+                styled.push_str(&message);
                 if let Some(source) = error.inner.source.as_deref() {
                     let _ = write!(styled, ": {source}");
                 }
@@ -340,10 +390,15 @@ fn write_dynamic_context(
             ) = (invalid_arg, actual_num_values, num_values)
             {
                 let were_provided = singular_or_plural(*actual_num_values as usize);
-                let _ = write!(
-                    styled,
-                    "{valid}{num_values}{valid:#} values required for '{literal}{invalid_arg}{literal:#}' but {invalid}{actual_num_values}{invalid:#}{were_provided}",
+                let message = msg_args!(
+                    "error-wrong-number-of-values",
+                    "{expected_values} values required for '{argument}' but {actual_values} {were_provided}",
+                    "expected_values" => format!("{valid}{num_values}{valid:#}"),
+                    "argument" => format!("{literal}{invalid_arg}{literal:#}"),
+                    "actual_values" => format!("{invalid}{actual_num_values}{invalid:#}"),
+                    "were_provided" => were_provided
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -352,10 +407,12 @@ fn write_dynamic_context(
         ErrorKind::UnknownArgument => {
             let invalid_arg = error.get(ContextKind::InvalidArg);
             if let Some(ContextValue::String(invalid_arg)) = invalid_arg {
-                let _ = write!(
-                    styled,
-                    "unexpected argument '{invalid}{invalid_arg}{invalid:#}' found",
+                let message = msg_args!(
+                    "error-unexpected-argument",
+                    "unexpected argument '{argument}' found",
+                    "argument" => format!("{invalid}{invalid_arg}{invalid:#}")
                 );
+                styled.push_str(&message);
                 true
             } else {
                 false
@@ -371,7 +428,7 @@ fn write_dynamic_context(
 
 #[cfg(feature = "error-context")]
 fn write_values_list(
-    list_name: &'static str,
+    list_name: &str,
     styled: &mut StyledStr,
     valid: &anstyle::Style,
     possible_values: Option<&ContextValue>,
@@ -412,11 +469,11 @@ pub(crate) fn format_error_message(
 }
 
 /// Returns the singular or plural form on the verb to be based on the argument's value.
-fn singular_or_plural(n: usize) -> &'static str {
+fn singular_or_plural(n: usize) -> String {
     if n > 1 {
-        " were provided"
+        msg!("error-were-provided", "were provided")
     } else {
-        " was provided"
+        msg!("error-was-provided", "was provided")
     }
 }
 
@@ -457,10 +514,12 @@ fn try_help(styled: &mut StyledStr, styles: &Styles, help: Option<&str>) {
     if let Some(help) = help {
         use std::fmt::Write as _;
         let literal = &styles.get_literal();
-        let _ = write!(
-            styled,
-            "\n\nFor more information, try '{literal}{help}{literal:#}'.\n",
+        let message = msg_args!(
+            "error-for-more-information-try",
+            "For more information, try '{help}'.",
+            "help" => format!("{literal}{help}{literal:#}")
         );
+        let _ = write!(styled, "\n\n{}\n", message);
     } else {
         styled.push_str("\n");
     }
@@ -471,23 +530,67 @@ fn did_you_mean(styled: &mut StyledStr, styles: &Styles, context: &str, possible
     use std::fmt::Write as _;
 
     let valid = &styles.get_valid();
-    let _ = write!(styled, "{TAB}{valid}tip:{valid:#}",);
+    let _ = write!(styled, "{TAB}{valid}{}:{valid:#}", msg!("error-tip", "tip"));
+
     if let ContextValue::String(possible) = possibles {
-        let _ = write!(
-            styled,
-            " a similar {context} exists: '{valid}{possible}{valid:#}'",
+        let context_name = match context {
+            "subcommand" => msg!("error-context-subcommand", "subcommand"),
+            "argument" => msg!("error-context-argument", "argument"),
+            "value" => msg!("error-context-value", "value"),
+            _ => context.to_string(),
+        };
+        let message = msg_args!(
+            "error-similar-exists-singular",
+            "a similar {context} exists: '{suggestion}'",
+            "context" => context_name,
+            "suggestion" => format!("{valid}{possible}{valid:#}")
         );
+        let _ = write!(styled, " {message}");
     } else if let ContextValue::Strings(possibles) = possibles {
-        if possibles.len() == 1 {
-            let _ = write!(styled, " a similar {context} exists: ",);
+        let context_name = match context {
+            "subcommand" => {
+                if possibles.len() == 1 {
+                    msg!("error-context-subcommand", "subcommand")
+                } else {
+                    msg!("error-context-subcommands", "subcommands")
+                }
+            }
+            "argument" => {
+                if possibles.len() == 1 {
+                    msg!("error-context-argument", "argument")
+                } else {
+                    msg!("error-context-arguments", "arguments")
+                }
+            }
+            "value" => {
+                if possibles.len() == 1 {
+                    msg!("error-context-value", "value")
+                } else {
+                    msg!("error-context-values", "values")
+                }
+            }
+            _ => context.to_string(),
+        };
+
+        let message = if possibles.len() == 1 {
+            msg_args!(
+                "error-similar-exists-singular",
+                "a similar {context} exists:",
+                "context" => context_name
+            )
         } else {
-            let _ = write!(styled, " some similar {context}s exist: ",);
-        }
+            msg_args!(
+                "error-similar-exists-plural",
+                "some similar {context} exist:",
+                "context" => context_name
+            )
+        };
+        let _ = write!(styled, " {}", message);
         for (i, possible) in possibles.iter().enumerate() {
             if i != 0 {
                 styled.push_str(", ");
             }
-            let _ = write!(styled, "'{valid}{possible}{valid:#}'",);
+            let _ = write!(styled, " '{valid}{possible}{valid:#}'",);
         }
     }
 }

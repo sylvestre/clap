@@ -20,6 +20,7 @@ use crate::output::Usage;
 use crate::output::TAB;
 use crate::output::TAB_WIDTH;
 use crate::util::FlatSet;
+use crate::{msg, msg_args};
 
 /// `clap` auto-generated help writer
 pub(crate) struct AutoHelp<'cmd, 'writer> {
@@ -201,8 +202,9 @@ impl<'cmd, 'writer> HelpTemplate<'cmd, 'writer> {
                     "usage-heading" => {
                         let _ = write!(
                             self.writer,
-                            "{}Usage:{}",
+                            "{}{}:{}",
                             self.styles.get_usage().render(),
+                            msg!("usage-header", "Usage"),
                             self.styles.get_usage().render_reset()
                         );
                     }
@@ -404,7 +406,7 @@ impl HelpTemplate<'_, '_> {
                 self.writer.push_str("\n\n");
             }
             first = false;
-            let default_help_heading = Str::from("Commands");
+            let default_help_heading = msg!("help-commands", "Commands");
             let help_heading = self
                 .cmd
                 .get_subcommand_help_heading()

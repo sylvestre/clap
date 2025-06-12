@@ -1,5 +1,8 @@
+use clap::util::locale::setup_localization;
+
 fn main() {
     #[allow(unused_mut)]
+    setup_localization("clap").expect("Failed to set up localization");
     let mut cmd = clap::Command::new("stdio-fixture")
         .version("1.0")
         .long_version("1.0 - a2132c")
