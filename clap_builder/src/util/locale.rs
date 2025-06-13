@@ -177,6 +177,12 @@ fn init_localization(
     locale: &LanguageIdentifier,
     locales_dir: &Path,
 ) -> Result<(), LocalizationError> {
+    // Check if already initialized first
+    let already_initialized = LOCALIZER.with(|lock| lock.get().is_some());
+    if already_initialized {
+        return Ok(());
+    }
+
     let en_locale = LanguageIdentifier::from_str(DEFAULT_LOCALE)
         .expect("Default locale should always be valid");
     let english_bundle = create_bundle(&en_locale, locales_dir)?;
@@ -191,9 +197,11 @@ fn init_localization(
     };
 
     LOCALIZER.with(|lock| {
-        lock.set(loc)
-            .map_err(|_| LocalizationError::Bundle("Localizer already initialized".into()))
-    })?;
+        // Use set() but ignore the error if it's already set
+        // This handles race conditions where another thread might have initialized it
+        // between our check above and this point
+        let _ = lock.set(loc);
+    });
     Ok(())
 }
 
@@ -250,6 +258,7 @@ pub fn setup_localization(_app_name: &str) -> Result<(), Box<dyn std::error::Err
 
 #[cfg(feature = "i18n")]
 /// Sets up localization for the application by detecting the system locale and initializing the localizer.
+/// This function is idempotent - calling it multiple times will not cause errors.
 ///
 /// # Arguments
 ///

@@ -18,53 +18,11 @@ clap-error-command-undefined = Command `{$name}` is undefined
 # Help messages for built-in functionality
 help-short-help = Print help (see more with '--help')
 help-long-help = Print help (see a summary with '-h')
-help-subcommand-help = Print help for the subcommand(s)
-
-# Application description placeholders
-app-about = A sample CLI application with full localization support
-app-long-about = This application demonstrates how to integrate localization into a clap-based command line tool using the improved inline English approach.
-app-after-help = For more information, visit: https://example.com/docs
-
-# Argument help messages
-arg-config-help = Sets a custom config file
-arg-config-long-help = Specifies the path to a configuration file. If not provided, the default configuration will be used.
-arg-verbose-help = Increase verbosity (use multiple times for more verbose output)
-arg-output-help = Output directory
-arg-format-help = Output format
-arg-input-help = Input file to process
-arg-threads-help = Number of processing threads
-arg-strict-help = Enable strict validation mode
-
-# Command descriptions
-cmd-process-about = Process the input file
-cmd-validate-about = Validate the input file
 
 # Help formatting
-help-usage-line = my-cli-app [OPTIONS] <INPUT> [COMMAND]
-help-description = A sample CLI application demonstrating localization features.
-help-options-header = OPTIONS:
-help-commands-header = COMMANDS:
 help-commands = Commands
-help-examples-header = EXAMPLES:
-
-# Informational messages
-info-verbose-level = Verbosity level set to { $level }
-info-using-config = Using configuration file: { $file }
-info-output-format = Output format: { $format }
-info-default-action = Performing default action on file: { $file }
-info-processing-file = Processing file '{ $file }' with { $threads } threads
-info-progress-update = Processing step { $step } of 5...
-info-processing-complete = Successfully processed file: { $file }
-info-validating-file = Validating file '{ $file }' in { $mode }
-info-validation-passed = File '{ $file }' passed validation
-
-# Validation modes
-validation-mode-strict = strict mode
-validation-mode-normal = normal mode
 
 # Error messages
-error-file-not-found = File not found: { $path }
-error-validation-strict-failed = Strict validation failed for file '{ $file }': unsupported format
 error-unrecognized-subcommand = unrecognized subcommand '{ $subcommand }'
 
 # Core error system

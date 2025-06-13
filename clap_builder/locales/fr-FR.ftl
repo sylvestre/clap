@@ -18,53 +18,11 @@ clap-error-command-undefined = La commande `{$name}` n'est pas définie
 # Messages d'aide pour les fonctionnalités intégrées
 help-short-help = Afficher l'aide (voir plus avec '--help')
 help-long-help = Afficher l'aide (voir un résumé avec '-h')
-help-subcommand-help = Afficher l'aide pour la/les sous-commande(s)
-
-# Descriptions d'application modèles
-app-about = Une application CLI d'exemple avec support de localisation complet
-app-long-about = Cette application démontre comment intégrer la localisation dans un outil en ligne de commande basé sur clap en utilisant l'approche anglaise en ligne améliorée.
-app-after-help = Pour plus d'informations, visitez : https://example.com/docs
-
-# Messages d'aide pour les arguments
-arg-config-help = Définit un fichier de configuration personnalisé
-arg-config-long-help = Spécifie le chemin vers un fichier de configuration. Si non fourni, la configuration par défaut sera utilisée.
-arg-verbose-help = Augmente la verbosité (utilisez plusieurs fois pour une sortie plus détaillée)
-arg-output-help = Répertoire de sortie
-arg-format-help = Format de sortie
-arg-input-help = Fichier d'entrée à traiter
-arg-threads-help = Nombre de threads de traitement
-arg-strict-help = Active le mode de validation strict
-
-# Descriptions des commandes
-cmd-process-about = Traite le fichier d'entrée
-cmd-validate-about = Valide le fichier d'entrée
 
 # Formatage de l'aide
-help-usage-line = my-cli-app [OPTIONS] <ENTRÉE> [COMMANDE]
-help-description = Une application CLI d'exemple démontrant les fonctionnalités de localisation.
-help-options-header = OPTIONS :
-help-commands-header = COMMANDES :
 help-commands = Commande
-help-examples-header = EXEMPLES :
-
-# Messages informatifs
-info-verbose-level = Niveau de verbosité défini à { $level }
-info-using-config = Utilisation du fichier de configuration : { $file }
-info-output-format = Format de sortie : { $format }
-info-default-action = Exécution de l'action par défaut sur le fichier : { $file }
-info-processing-file = Traitement du fichier '{ $file }' avec { $threads } threads
-info-progress-update = Étape de traitement { $step } sur 5...
-info-processing-complete = Fichier traité avec succès : { $file }
-info-validating-file = Validation du fichier '{ $file }' en { $mode }
-info-validation-passed = Le fichier '{ $file }' a passé la validation
-
-# Modes de validation
-validation-mode-strict = mode strict
-validation-mode-normal = mode normal
 
 # Messages d'erreur
-error-file-not-found = Fichier non trouvé : { $path }
-error-validation-strict-failed = La validation stricte a échoué pour le fichier '{ $file }' : format non supporté
 error-unrecognized-subcommand = Sous-commande non reconnue '{ $subcommand }'
 
 # Système d'erreur principal
