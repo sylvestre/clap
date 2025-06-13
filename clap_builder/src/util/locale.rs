@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 #[cfg(feature = "i18n")]
 use fluent::{FluentArgs, FluentBundle, FluentResource};
 #[cfg(feature = "i18n")]

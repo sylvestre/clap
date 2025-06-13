@@ -165,7 +165,7 @@ foo 3.0 (abcdefg)
 #[test]
 fn help_short_flag_no_version() {
     static EXPECTED: &str = "\
-foo
+foo 
 
 Usage: foo
 
@@ -179,7 +179,7 @@ Options:
 #[test]
 fn help_long_flag_no_version() {
     static EXPECTED: &str = "\
-foo
+foo 
 
 Usage: foo
 

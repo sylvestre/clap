@@ -200,7 +200,7 @@ fn write_dynamic_context(
                             "error-one-or-more-other-arguments",
                             "one or more of the other specified arguments"
                         );
-                        styled.push_str(&format!(" {}", msg));
+                        styled.push_str(&format!(" {msg}"));
                     }
                 }
             }
@@ -519,7 +519,7 @@ fn try_help(styled: &mut StyledStr, styles: &Styles, help: Option<&str>) {
             "For more information, try '{help}'.",
             "help" => format!("{literal}{help}{literal:#}")
         );
-        let _ = write!(styled, "\n\n{}\n", message);
+        let _ = write!(styled, "\n\n{message}\n");
     } else {
         styled.push_str("\n");
     }

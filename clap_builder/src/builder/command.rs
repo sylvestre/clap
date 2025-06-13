@@ -32,7 +32,6 @@ use crate::{Error, INTERNAL_ERROR_MSG};
 
 // Localization imports
 use crate::{msg, msg_args};
-use std::collections::HashMap;
 
 #[cfg(debug_assertions)]
 use crate::builder::debug_asserts::assert_app;
