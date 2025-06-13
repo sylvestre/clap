@@ -14,7 +14,7 @@ use crate::util::FlatSet;
 use crate::util::Id;
 
 // Localization macros
-use crate::{msg, msg_args};
+use crate::msg;
 
 const USAGE_SEP: &str = "\n       ";
 

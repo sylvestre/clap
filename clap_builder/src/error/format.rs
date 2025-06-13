@@ -2,7 +2,6 @@
 #![allow(missing_debug_implementations)]
 #![cfg_attr(not(feature = "error-context"), allow(dead_code))]
 #![cfg_attr(not(feature = "error-context"), allow(unused_imports))]
-use crate::util::locale;
 use std::borrow::Cow;
 
 use crate::builder::Command;

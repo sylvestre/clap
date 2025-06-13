@@ -65,6 +65,7 @@ impl From<std::io::Error> for LocalizationError {
     }
 }
 
+/// The default locale used for localization when no other locale is specified.
 pub const DEFAULT_LOCALE: &str = "en-US";
 
 #[cfg(not(feature = "i18n"))]
@@ -77,6 +78,7 @@ macro_rules! msg {
 
 #[cfg(feature = "i18n")]
 #[macro_export]
+/// Macro for retrieving a localized message by its ID, falling back to the provided English string if necessary.
 macro_rules! msg {
     ($id:expr, $english:expr) => {{
         $crate::util::locale::get_message_internal($id, $english, None)
@@ -164,7 +166,18 @@ thread_local! {
 }
 
 #[cfg(feature = "i18n")]
-pub fn get_message_internal(id: &str, english: &str, args: Option<FluentArgs>) -> String {
+/// Retrieves a localized message by its ID, falling back to the provided English string if necessary.
+///
+/// # Arguments
+///
+/// * `id` - The message identifier.
+/// * `english` - The English fallback string.
+/// * `args` - Optional Fluent arguments for message formatting.
+///
+/// # Returns
+///
+/// The localized message as a `String`.
+pub fn get_message_internal(id: &str, english: &str, args: Option<FluentArgs<'_>>) -> String {
     LOCALIZER.with(|lock| {
         lock.get()
             .map(|loc| loc.format(id, english, args.as_ref()))

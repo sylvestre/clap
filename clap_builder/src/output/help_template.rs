@@ -10,7 +10,6 @@ use std::collections::BTreeMap;
 
 // Internal
 use crate::builder::PossibleValue;
-use crate::builder::Str;
 use crate::builder::StyledStr;
 use crate::builder::Styles;
 use crate::builder::{Arg, Command};
@@ -20,7 +19,7 @@ use crate::output::Usage;
 use crate::output::TAB;
 use crate::output::TAB_WIDTH;
 use crate::util::FlatSet;
-use crate::{msg, msg_args};
+use crate::msg;
 
 /// `clap` auto-generated help writer
 pub(crate) struct AutoHelp<'cmd, 'writer> {
