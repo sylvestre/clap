@@ -137,8 +137,6 @@ impl Localizer {
     }
 
     fn format(&self, id: &str, english: &str, args: Option<&FluentArgs<'_>>) -> String {
-        println!("Formatting message with id: {}", id);
-        println!("English fallback: {}", english);
         if let Some(message) = self.primary_bundle.get_message(id).and_then(|m| m.value()) {
             let mut errs = Vec::new();
             return self
@@ -167,9 +165,6 @@ thread_local! {
 
 #[cfg(feature = "i18n")]
 pub fn get_message_internal(id: &str, english: &str, args: Option<FluentArgs>) -> String {
-    println!("Formatting message with id: {}", id);
-    println!("English fallback: {}", english);
-
     LOCALIZER.with(|lock| {
         lock.get()
             .map(|loc| loc.format(id, english, args.as_ref()))
