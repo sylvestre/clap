@@ -1,3 +1,5 @@
+//! Handles localization (l10n) for the application.
+//! This module uses the Fluent localization system when the `i18n` feature is enabled.
 #[cfg(feature = "i18n")]
 use fluent::{FluentArgs, FluentBundle, FluentResource};
 #[cfg(feature = "i18n")]
@@ -14,15 +16,23 @@ use std::sync::OnceLock;
 use unic_langid::LanguageIdentifier;
 
 #[cfg(feature = "i18n")]
+/// Represents errors that can occur during localization operations.
 #[derive(Debug)]
 pub enum LocalizationError {
+    /// Represents an I/O error that occurred while loading a localization resource.
     Io {
+        /// The underlying I/O error that occurred.
         source: std::io::Error,
+        /// The path where the I/O error occurred.
         path: PathBuf,
     },
+    /// Represents a parsing error that occurred while processing a localization resource.
     Parse(String),
+    /// Represents an error that occurred while adding a resource to a Fluent bundle.
     Bundle(String),
+    /// Represents an error when the locales directory cannot be found.
     LocalesDirNotFound(String),
+    /// Represents an error that occurred during path resolution.
     PathResolution(String),
 }
 
